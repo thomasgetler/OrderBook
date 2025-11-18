@@ -12,6 +12,8 @@ private:
 	void validateOrder(const Order& orderRequest);
 	std::unordered_map<std::string, std::string> splitString(const std::string& dateTime);
 	bool dateComparison(const std::unordered_map<std::string,std::string>& firstDate, const std::unordered_map<std::string, std::string>& secondDate);
+	void sortBuyOrders();
+	void sortSellOrders();
 	
 
 public:

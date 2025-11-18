@@ -32,5 +32,8 @@ public:
 	std::string getOrderTime() const;
 	std::string getOrderId() const;
 
+	//Setters 
+	void setQuantity(int newQuant);
+
 };
 

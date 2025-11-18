@@ -1,7 +1,7 @@
 #include "OrderBook.h"
 #include <exception>
 #include <sstream>
-
+#include <algorithm>
 
 
 void OrderBook::updateOrder(const Order& orderRequest) {
@@ -138,6 +138,26 @@ void OrderBook::printSellOrders()const {
         each.printOrder();
     }
 }
+
+
+
+void OrderBook::sortBuyOrders() {
+    std::sort(buyOrders.begin(), buyOrders.end(),
+        [](const Order& a, const Order& b) {
+            return a.getOrderPrice() > b.getOrderPrice(); // highest first
+        }
+    );
+}
+
+void OrderBook::sortSellOrders() {
+    std::sort(sellOrders.begin(), sellOrders.end(),
+        [](const Order& a, const Order& b) {
+            return a.getOrderPrice() < b.getOrderPrice(); // lowest first
+        }
+    );
+
+
+
 
 void OrderBook::runOrders() {
     // Sort the order books first

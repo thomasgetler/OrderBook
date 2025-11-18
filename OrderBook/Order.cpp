@@ -77,3 +77,6 @@ std::string Order::getOrderId() const { return this->orderID; }
 std::string Order::getOrderTime() const { return orderTime; }
 std::string Order::getStockSymbol() const { return stockSymbol; }
 
+//Setters
+
+void Order::setQuantity(int newQuant) { this->quantity = newQuant; }
