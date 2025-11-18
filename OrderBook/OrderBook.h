@@ -22,6 +22,7 @@ public:
 	void printBuyOrders() const;
 	void printSellOrders() const;
 	void runOrders();
+	void deleteOrders(const std::string&);
 
 };
 

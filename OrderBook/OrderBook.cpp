@@ -156,49 +156,77 @@ void OrderBook::sortSellOrders() {
         }
     );
 
+}
 
 
+    void OrderBook::runOrders() {
+        // Sort the order books first
+        sortBuyOrders();   // highest first
+        sortSellOrders();  // lowest first
 
-void OrderBook::runOrders() {
-    // Sort the order books first
-    sortBuyOrders();   // highest first
-    sortSellOrders();  // lowest first
+        // Outer loop over buy orders
+        for (size_t i = 0; i < buyOrders.size(); ++i) {
+            Order& buyOrder = buyOrders[i];
 
-    // Outer loop over buy orders
-    for (size_t i = 0; i < buyOrders.size(); ++i) {
-        Order& buyOrder = buyOrders[i];
+            // Inner loop over sell orders
+            for (size_t j = 0; j < sellOrders.size(); ++j) {
+                Order& sellOrder = sellOrders[j];
 
-        // Inner loop over sell orders
-        for (size_t j = 0; j < sellOrders.size(); ++j) {
-            Order& sellOrder = sellOrders[j];
+                // Trade possible?
+                if (buyOrder.getOrderPrice() >= sellOrder.getOrderPrice()) {
 
-            // Trade possible?
-            if (buyOrder.getOrderPrice() >= sellOrder.getOrderPrice()) {
+                    int tradeQty = std::min(buyOrder.getQuantity(), sellOrder.getQuantity());
 
-                int tradeQty = std::min(buyOrder.getQuantity(), sellOrder.getQuantity());
+                    // Execute trade
+                    std::cout << "Trade executed: "
+                        << tradeQty << " units at price "
+                        << sellOrder.getOrderPrice() << std::endl;
+                 
+                        // Update quantities
+                        buyOrder.setQuantity(buyOrder.getQuantity() - tradeQty);
+                    sellOrder.setQuantity(sellOrder.getQuantity() - tradeQty);
 
-                // Execute trade
-                std::cout << "Trade executed: "
-                    << tradeQty << " units at price "
-                    << sellOrder.getOrderPrice() << std::endl;
+                    // Remove fully filled orders
+                    if (buyOrder.getQuantity() == 0) {
+                        buyOrders.erase(buyOrders.begin() + i);
+                        --i; // adjust index after erase
+                        break; // move to next buy order
+                    }
 
-                // Update quantities
-                buyOrder.setQuantity(buyOrder.getQuantity() - tradeQty);
-                sellOrder.setQuantity(sellOrder.getQuantity() - tradeQty);
-
-                // Remove fully filled orders
-                if (buyOrder.getQuantity() == 0) {
-                    buyOrders.erase(buyOrders.begin() + i);
-                    --i; // adjust index after erase
-                    break; // move to next buy order
-                }
-
-                if (sellOrder.getQuantity() == 0) {
-                    sellOrders.erase(sellOrders.begin() + j);
-                    --j; // adjust index after erase
+                    if (sellOrder.getQuantity() == 0) {
+                        sellOrders.erase(sellOrders.begin() + j);
+                        --j; // adjust index after erase
+                    }
                 }
             }
         }
     }
 
-}
+    void OrderBook::deleteOrders(const std::string& orderID) {
+
+        // --- BUY ORDERS ---
+        for (int i = 0; i < buyOrders.size(); i++) {
+            if (buyOrders[i].getOrderId() == orderID) {
+                buyOrders.erase(buyOrders.begin() + i);
+                std::cout << "ORDER ID: " << orderID << " HAS BEEN DELETED" << std::endl;
+                this->sortBuyOrders();
+                return;
+            }
+        }
+
+        // --- SELL ORDERS ---
+        for (int i = 0; i < sellOrders.size(); i++) {
+            if (sellOrders[i].getOrderId() == orderID) {
+
+                // ? BUG FIX: You used buyOrders.begin() here by mistake
+                sellOrders.erase(sellOrders.begin() + i);
+
+                std::cout << "ORDER ID: " << orderID << " HAS BEEN DELETED" << std::endl;
+                this->sortSellOrders();
+                return;
+            }
+        }
+
+        std::cout << "COULD NOT FIND ANY ORDER IN BUY OR SELL LIST WITH ID "
+            << orderID << std::endl;
+    }
